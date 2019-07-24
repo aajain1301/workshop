@@ -1,8 +1,8 @@
-
 from rest_framework import serializers
-
 from registration.models import User
-
+from rest_framework import status
+from rest_framework.response import Response
+from .sms import send_sms
 
 class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
@@ -21,9 +21,17 @@ class UserSerializer(serializers.ModelSerializer):
             address=validated_data['address'],
             pay_mode=validated_data['pay_mode'],
         )
+
+        # if User.objects.filter(contact=contact).exists():
+        #     raise serializers.ValidationError('An account with this email already exists.')
+        #     return Response(content, status=status.HTTP_409_CONFLICT)
+
         user.set_password(validated_data['password'])
         user.save()
+        send_sms(user.contact)
         return user
+
+
     class Meta:
         model = User
         extra_kwargs = {'password': {'write_only': True}}

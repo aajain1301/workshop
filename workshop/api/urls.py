@@ -14,9 +14,10 @@ from django.urls import include, path
 # ]
 
 from . import views
-
+from api import sms
 urlpatterns = [
     path('', views.UserListView.as_view()),
     path('<int:pk>/', views.UserDetailView.as_view()),
     path('rest-auth/', include('rest_auth.urls')),
+    path('sms/',sms.send_sms,name='sms'),
 ]
